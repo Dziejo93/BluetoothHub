@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">BluetoothHub</string>
+    <string name="sender_mode">Sender Mode</string>
+    <string name="btEnableDialog">Alert dialog</string>
+    <string name="btTitle">Enable Bluetooth</string>
+    <string name="btContent">Do You want to switch Bluetooth on ?</string>
+    <string name="ok">Ok</string>
+    <string name="cancel">Cancel</string>
+</resources>
