@@ -77,8 +77,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
-
-
+    public void clickRecieverMode(View view) {
+        Intent intentDeviceList = new Intent(MainActivity.this, DeviceListActivity.class);
+        startActivity(intentDeviceList);
+    }
 }
 

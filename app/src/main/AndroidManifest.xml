@@ -21,8 +21,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".DeviceListActivity"/>
         <activity android:name=".FileChooser" />
-        <activity android:name=".SenderMode"></activity>
+        <activity android:name=".SenderMode" />
     </application>
 
 </manifest>
