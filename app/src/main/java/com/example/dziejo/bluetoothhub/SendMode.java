@@ -1,12 +1,16 @@
 package com.example.dziejo.bluetoothhub;
 
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.content.ComponentName;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -19,9 +23,9 @@ public class SendMode extends AppCompatActivity {
 
     private static final int DISCOVER_DURATION = 300;
     private static final int REQUEST_BLU = 1;
-    private TextView txtPath, txt2;
+    private TextView txtPath, txtAdress;
     private Button btnSend;
-    private String fileDir;
+    private String fileDir,address;
     private BluetoothAdapter mBluetoothAdapter;
 
     @Override
@@ -30,7 +34,7 @@ public class SendMode extends AppCompatActivity {
         setContentView(R.layout.activity_send_mode);
 
         txtPath = findViewById(R.id.editTxt1);
-        txt2 = findViewById(R.id.editTxt2);
+        txtAdress = findViewById(R.id.editTxt2);
         btnSend = findViewById(R.id.btnSend);
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -43,6 +47,10 @@ public class SendMode extends AppCompatActivity {
             if (lol != null) txtPath.setText(lol);
         }
 
+        address=DeviceListActivity.DEVICE_ADRESS;
+        txtAdress.setText(address);
+        Log.d("adress", address);
+
 
     }
 
@@ -51,55 +59,50 @@ public class SendMode extends AppCompatActivity {
             if (mBluetoothAdapter == null) {
                 Toast.makeText(this, R.string.bt_not_enabled_leaving, Toast.LENGTH_LONG).show();
             } else {
-                enableBluetooth();
+                sendFileViaBluetooth(fileDir,address);
             }
         } else {
             Toast.makeText(this, "Please select a file.", Toast.LENGTH_LONG).show();
         }
     }
 
-    public void enableBluetooth() {
-        Intent discoveryIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-        discoveryIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, DISCOVER_DURATION);
-        startActivityForResult(discoveryIntent, REQUEST_BLU);
-    }
+    public boolean sendFileViaBluetooth(String file_path, String destinationMAC){
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == DISCOVER_DURATION && requestCode == REQUEST_BLU) {
-            Intent i = new Intent();
-            i.setAction(Intent.ACTION_SEND);
-            i.setType("*/*");
-            File file = new File(fileDir);
+        if(mBluetoothAdapter == null)
+            return false;
 
-            i.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
+        BluetoothDevice btdev = mBluetoothAdapter.getRemoteDevice(destinationMAC);
+        if(btdev == null)
+            return false;
 
-            PackageManager pm = getPackageManager();
-            List<ResolveInfo> list = pm.queryIntentActivities(i, 0);
-            if (list.size() > 0) {
-                String packageName = null;
-                String className = null;
-                boolean found = false;
+        Uri uri = Uri.fromFile(new File(file_path));
 
-                for (ResolveInfo info : list) {
-                    packageName = info.activityInfo.packageName;
-                    if (packageName.equals("com.android.bluetooth")) {
-                        className = info.activityInfo.name;
-                        found = true;
-                        break;
-                    }
-                }
+        Intent shareIntent = new Intent(Intent.ACTION_SEND)
+                .putExtra(Intent.EXTRA_STREAM, uri)
+                .setType("*/*");
 
-                if (!found) {
-                    Toast.makeText(this, "Bluetooth not been found", Toast.LENGTH_LONG).show();
-                } else {
-                    i.setClassName(packageName, className);
-                    startActivity(i);
-                }
+        List<ResolveInfo> resolvedActivities = getPackageManager().queryIntentActivities(shareIntent,  0);
+
+        boolean found = false;
+        for(ResolveInfo actInfo: resolvedActivities){
+            if(actInfo.activityInfo.packageName.equals("com.android.bluetooth"))
+            {
+                shareIntent.setComponent( new ComponentName(actInfo.activityInfo.packageName, actInfo.activityInfo.name ) );
+                shareIntent.putExtra("com.mediatek.bluetooth.sharegateway.extra.DEVICE_ADDRESS", btdev);
+                shareIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+                found = true;
+                break;
             }
-        } else {
-            Toast.makeText(this, "Bluetooth is cancelled", Toast.LENGTH_LONG).show();
         }
+
+        if(found){
+            startActivity(shareIntent);
+            return true;
+        }
+
+        return false;
     }
+
+
 
 }
