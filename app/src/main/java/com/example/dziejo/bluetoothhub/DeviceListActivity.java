@@ -82,7 +82,7 @@ public class DeviceListActivity extends Activity {
     };
     // The on-click listener for all devices in the ListViews
     private OnItemClickListener mDeviceClickListener = new OnItemClickListener() {
-        public void onItemClick(AdapterView<?> av, View v, int arg2, long arg3) {
+        public void onItemClick(AdapterView<?> av, View v, int position, long arg3) {
             // Cancel discovery because it's costly and we're about to connect
             mBtAdapter.cancelDiscovery();
 
@@ -91,12 +91,16 @@ public class DeviceListActivity extends Activity {
             String address = info.substring(info.length() - 17);
 
             // Create the result Intent and include the MAC address
-            Intent intent = new Intent();
-            intent.putExtra(EXTRA_DEVICE_ADDRESS, address);
+            Intent firstIntent = new Intent();
+            firstIntent.putExtra(EXTRA_DEVICE_ADDRESS, address);
 
             // Set result and finish this Activity
-            setResult(Activity.RESULT_OK, intent);
-            finish();
+            setResult(Activity.RESULT_OK, firstIntent);
+            Intent goToChoser = new Intent(DeviceListActivity.this,FileChooser.class);
+            startActivityForResult(goToChoser,0);
+
+
+
         }
     };
 
@@ -112,7 +116,7 @@ public class DeviceListActivity extends Activity {
         setResult(Activity.RESULT_CANCELED);
 
         // Initialize the button to perform device discovery
-        Button scanButton = (Button) findViewById(R.id.button_scan);
+        Button scanButton = findViewById(R.id.button_scan);
 
 
         // Initialize array adapters. One for already paired devices and

@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">BluetoothHub</string>
-    <string name="sender_mode">Sender Mode</string>
+    <string name="sender_mode">Search for devices</string>
     <string name="btEnableDialog">Alert dialog</string>
     <string name="btTitle">Enable Bluetooth</string>
     <string name="btContent">Do You want to switch Bluetooth on ?</string>
@@ -13,4 +13,13 @@
     <string name="title_paired_devices">title_paired_devices</string>
     <string name="title_other_devices">title_other_devices</string>
     <string name="scan_for_elements">Scan for elements</string>
+    <string name="title_connected_to">connected to</string>
+    <string name="title_connecting">connecting</string>
+    <string name="title_not_connected">not connected</string>
+    <string name="bt_not_enabled_leaving">bt not enabled</string>
+    <string name="connect">connect</string>
+    <string name="discoverable">discoverable</string>
+    <string name="not_connected">not connected</string>
+    <string name="send">send</string>
+    <string name="send_your_data">Send Your data</string>
 </resources>

@@ -7,6 +7,11 @@
         android:required="true" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 
+
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -21,9 +26,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".DeviceListActivity"/>
+        <activity android:name=".DeviceListActivity" />
         <activity android:name=".FileChooser" />
-        <activity android:name=".SenderMode" />
+        <activity android:name=".SendMode"></activity>
     </application>
 
 </manifest>

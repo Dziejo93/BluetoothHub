@@ -27,8 +27,8 @@ public class MainActivity extends AppCompatActivity {
     public void clickSenderMode(View view) {
         btChecker();
         if (WENT_THROUGH_BT_CHECK) {
-            Intent intentFileChooser = new Intent(MainActivity.this, FileChooser.class);
-            startActivity(intentFileChooser);
+            Intent intentFileChooser = new Intent(MainActivity.this, DeviceListActivity.class);
+            startActivityForResult(intentFileChooser,0);
         }
 
     }
@@ -77,9 +77,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void clickRecieverMode(View view) {
-        Intent intentDeviceList = new Intent(MainActivity.this, DeviceListActivity.class);
-        startActivity(intentDeviceList);
-    }
+
 }
 
