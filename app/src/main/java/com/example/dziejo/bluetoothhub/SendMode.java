@@ -3,9 +3,7 @@ package com.example.dziejo.bluetoothhub;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.ComponentName;
-import android.content.ContentValues;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Bundle;
@@ -21,11 +19,10 @@ import java.util.List;
 
 public class SendMode extends AppCompatActivity {
 
-    private static final int DISCOVER_DURATION = 300;
-    private static final int REQUEST_BLU = 1;
-    private TextView txtPath, txtAdress;
+    private static final String BT_ADRESS = "btAdress";
+    private TextView txtPath;
     private Button btnSend;
-    private String fileDir,address;
+    private String fileDir, address;
     private BluetoothAdapter mBluetoothAdapter;
 
     @Override
@@ -34,7 +31,6 @@ public class SendMode extends AppCompatActivity {
         setContentView(R.layout.activity_send_mode);
 
         txtPath = findViewById(R.id.editTxt1);
-        txtAdress = findViewById(R.id.editTxt2);
         btnSend = findViewById(R.id.btnSend);
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -46,11 +42,7 @@ public class SendMode extends AppCompatActivity {
             String lol = x.getAbsolutePath();
             if (lol != null) txtPath.setText(lol);
         }
-
-        address=DeviceListActivity.DEVICE_ADRESS;
-        txtAdress.setText(address);
-        Log.d("adress", address);
-
+        address = "0";//xD nie działa
 
     }
 
@@ -59,21 +51,22 @@ public class SendMode extends AppCompatActivity {
             if (mBluetoothAdapter == null) {
                 Toast.makeText(this, R.string.bt_not_enabled_leaving, Toast.LENGTH_LONG).show();
             } else {
-                sendFileViaBluetooth(fileDir,address);
+                sendFileViaBluetooth(fileDir, address);
             }
         } else {
             Toast.makeText(this, "Please select a file.", Toast.LENGTH_LONG).show();
         }
     }
 
-    public boolean sendFileViaBluetooth(String file_path, String destinationMAC){
+    public boolean sendFileViaBluetooth(String file_path, String destinationMAC) {
 
-        if(mBluetoothAdapter == null)
+        if (mBluetoothAdapter == null)
             return false;
-
         BluetoothDevice btdev = mBluetoothAdapter.getRemoteDevice(destinationMAC);
-        if(btdev == null)
+        Log.d(BT_ADRESS, "sendFileViaBluetooth: " + btdev.getAddress());
+        if (btdev == null)
             return false;
+
 
         Uri uri = Uri.fromFile(new File(file_path));
 
@@ -81,28 +74,26 @@ public class SendMode extends AppCompatActivity {
                 .putExtra(Intent.EXTRA_STREAM, uri)
                 .setType("*/*");
 
-        List<ResolveInfo> resolvedActivities = getPackageManager().queryIntentActivities(shareIntent,  0);
+        List<ResolveInfo> resolvedActivities = getPackageManager().queryIntentActivities(shareIntent, 0);
 
         boolean found = false;
-        for(ResolveInfo actInfo: resolvedActivities){
-            if(actInfo.activityInfo.packageName.equals("com.android.bluetooth"))
-            {
-                shareIntent.setComponent( new ComponentName(actInfo.activityInfo.packageName, actInfo.activityInfo.name ) );
-                shareIntent.putExtra("com.mediatek.bluetooth.sharegateway.extra.DEVICE_ADDRESS", btdev);
+        for (ResolveInfo actInfo : resolvedActivities) {
+            if (actInfo.activityInfo.packageName.equals("com.example.dziejo.bluetoothhub")) {
+                shareIntent.setComponent(new ComponentName(actInfo.activityInfo.packageName, actInfo.activityInfo.name));
+                shareIntent.putExtra("com.example.dziejo.bluetoothhub.extra.DEVICE_ADDRESS", btdev);
                 shareIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
                 found = true;
                 break;
             }
         }
 
-        if(found){
+        if (found) {
             startActivity(shareIntent);
             return true;
         }
 
         return false;
     }
-
 
 
 }

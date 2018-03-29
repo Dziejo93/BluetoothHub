@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">BluetoothHub</string>
-    <string name="sender_mode">Search for devices</string>
+    <string name="sender_mode">Send using file sender</string>
     <string name="btEnableDialog">Alert dialog</string>
     <string name="btTitle">Enable Bluetooth</string>
     <string name="btContent">Do You want to switch Bluetooth on ?</string>
@@ -22,4 +22,10 @@
     <string name="not_connected">not connected</string>
     <string name="send">send</string>
     <string name="send_your_data">Send Your data</string>
+    <string name="bluetooth_enabled">Bluetooth Enabled</string>
+    <string name="send_file_using_streaming">Send file using streaming</string>
+
+    <string name="title_activity_streaming">StreamingActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
 </resources>
