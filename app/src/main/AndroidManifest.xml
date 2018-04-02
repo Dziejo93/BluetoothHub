@@ -24,7 +24,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".DeviceListActivity" />
         <activity android:name=".FileChooser" />
         <activity android:name=".SendMode" />
         <activity android:name=".StreamingActivity"></activity>

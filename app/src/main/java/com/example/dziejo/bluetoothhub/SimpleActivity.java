@@ -20,10 +20,16 @@ import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.Toast;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 
 import app.akexorcist.bluetotohspp.library.BluetoothSPP;
 import app.akexorcist.bluetotohspp.library.BluetoothSPP.BluetoothConnectionListener;
@@ -31,14 +37,26 @@ import app.akexorcist.bluetotohspp.library.BluetoothSPP.OnDataReceivedListener;
 import app.akexorcist.bluetotohspp.library.BluetoothState;
 import app.akexorcist.bluetotohspp.library.DeviceList;
 
+import static android.content.ContentValues.TAG;
+
 public class SimpleActivity extends Activity {
     BluetoothSPP bt;
+    private String fileDir;
+    private File x;
+    private byte[] byteFile = null;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_simple);
 
         bt = new BluetoothSPP(this);
+
+        Intent intentFile = getIntent();
+        fileDir = intentFile.getStringExtra("File");
+        if (fileDir != null) {
+            x = new File(intentFile.getStringExtra("File"));
+            fileConverter(x);
+        }
 
         if (!bt.isBluetoothAvailable()) {
             Toast.makeText(getApplicationContext()
@@ -47,12 +65,17 @@ public class SimpleActivity extends Activity {
             finish();
         }
 
+        //what is he doing when recieving data
         bt.setOnDataReceivedListener(new OnDataReceivedListener() {
             public void onDataReceived(byte[] data, String message) {
-                Toast.makeText(SimpleActivity.this, message, Toast.LENGTH_SHORT).show();
+                Toast.makeText(SimpleActivity.this, "Odebrałem plik kurwo", Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "onDataReceived: i try to save");
+                fileSaver(data);
             }
         });
 
+
+        //msg when connected
         bt.setBluetoothConnectionListener(new BluetoothConnectionListener() {
             public void onDeviceConnected(String name, String address) {
                 Toast.makeText(getApplicationContext()
@@ -71,7 +94,7 @@ public class SimpleActivity extends Activity {
             }
         });
 
-        Button btnConnect = (Button) findViewById(R.id.btnConnect);
+        Button btnConnect = findViewById(R.id.btnConnect);
         btnConnect.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 if (bt.getServiceState() == BluetoothState.STATE_CONNECTED) {
@@ -104,10 +127,12 @@ public class SimpleActivity extends Activity {
     }
 
     public void setup() {
-        Button btnSend = (Button) findViewById(R.id.btnSend);
+        Button btnSend = findViewById(R.id.btnSend);
         btnSend.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 bt.send("Text", true);
+                if (byteFile != null)
+                    bt.send(byteFile, true);
             }
         });
     }
@@ -128,5 +153,37 @@ public class SimpleActivity extends Activity {
                 finish();
             }
         }
+    }
+
+    private void fileConverter(File file) {
+        byte[] data = new byte[(int) file.length()];
+        try {
+            new FileInputStream(file).read(data);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e(TAG, "fileConverter: Couldn't convert to byte array ");
+        }
+        byteFile = data;
+    }
+
+    private void fileSaver(byte[] recievedFile) {
+
+        Log.e(TAG, "fileSaver: " + recievedFile.length);
+        File file = new File(Environment.getExternalStorageDirectory(), "jp2gmd.txt");
+        FileOutputStream fos = null;
+        if (file.exists()) {
+            file.delete();
+        }
+
+        try {
+            fos = new FileOutputStream(file.getPath());
+
+            fos.write(recievedFile);
+            fos.close();
+        } catch (java.io.IOException e) {
+            Log.e("PictureDemo", "Exception in photoCallback", e);
+        }
+
+
     }
 }

@@ -44,7 +44,6 @@ public class FileChooser extends AppCompatActivity {
         if (whichMode != null) {
             if (whichMode.equals(MainActivity.STREAM_MODE_CHOSEN)) {
                 openSender = new Intent(FileChooser.this, SimpleActivity.class);
-
             } else if (whichMode.equals(MainActivity.NORMAL_MODE_CHOSEN)) {
                 openSender = new Intent(FileChooser.this, SendMode.class);
             } else {

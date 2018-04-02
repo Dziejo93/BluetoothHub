@@ -96,5 +96,10 @@ public class MainActivity extends AppCompatActivity {
         streamIntent.putExtra("Which", STREAM_MODE_CHOSEN);
         startActivity(streamIntent);
     }
+    public void onRecieveStream(View view){
+        btChecker();
+        Intent streamRecieveIntent=new Intent(this,SimpleActivity.class);
+        startActivity(streamRecieveIntent);
+    }
 }
 
