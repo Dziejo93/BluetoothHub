@@ -27,6 +27,8 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.obsez.android.lib.filechooser.ChooserDialog;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -44,6 +46,9 @@ public class SimpleActivity extends Activity {
     private String fileDir;
     private File x;
     private byte[] byteFile = null;
+    private String tempFileName;
+    private Button btnSend, btnChoose;
+
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,13 +56,6 @@ public class SimpleActivity extends Activity {
 
         bt = new BluetoothSPP(this);
 
-        Intent intentFile = getIntent();
-        fileDir = intentFile.getStringExtra("File");
-        if (fileDir != null) {
-            x = new File(intentFile.getStringExtra("File"));
-            fileConverter(x);
-            Log.e(TAG, "onCreate: " + x.getName());
-        }
 
         if (!bt.isBluetoothAvailable()) {
             Toast.makeText(getApplicationContext()
@@ -70,8 +68,16 @@ public class SimpleActivity extends Activity {
         bt.setOnDataReceivedListener(new OnDataReceivedListener() {
             public void onDataReceived(byte[] data, String message) {
                 Log.e(TAG, "onDataReceived: i try to save");
-                fileSaver(data, message);
+                if (tempFileName == null) {
+
+                    tempFileName = message;
+                    Log.e(TAG, "onDataReceived: " + tempFileName);
+
+                }
+                fileSaver(data);
                 Toast.makeText(SimpleActivity.this, "File has been received", Toast.LENGTH_SHORT).show();
+
+
             }
         });
 
@@ -82,11 +88,18 @@ public class SimpleActivity extends Activity {
                 Toast.makeText(getApplicationContext()
                         , "Connected to " + name + "\n" + address
                         , Toast.LENGTH_SHORT).show();
+                btnChoose.setEnabled(true);
+
+
             }
 
             public void onDeviceDisconnected() {
                 Toast.makeText(getApplicationContext()
                         , "Connection lost", Toast.LENGTH_SHORT).show();
+                btnChoose.setEnabled(false);
+                btnSend.setEnabled(false);
+                tempFileName = null;
+
             }
 
             public void onDeviceConnectionFailed() {
@@ -108,6 +121,11 @@ public class SimpleActivity extends Activity {
         });
     }
 
+    public void onClickSelectFile(View v) {
+        singleFileBrowser("/sdcard");
+    }
+
+
     public void onDestroy() {
         super.onDestroy();
         bt.stopService();
@@ -128,13 +146,18 @@ public class SimpleActivity extends Activity {
     }
 
     public void setup() {
-        Button btnSend = findViewById(R.id.btnSend);
-        btnSend.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                bt.send(x.getName(), true);
-                if (byteFile != null) bt.send(byteFile, true);
-            }
-        });
+        btnSend = findViewById(R.id.btnSend);
+        btnChoose = findViewById(R.id.btnChoose);
+        btnChoose.setEnabled(false);
+        btnSend.setEnabled(false);
+
+
+    }
+
+    public void onClickSend(View v) {
+        bt.send(x.getName(),true);
+        fileConverter(x);
+        if (byteFile != null) bt.send(byteFile, true);
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -155,7 +178,7 @@ public class SimpleActivity extends Activity {
         }
     }
 
-    private void fileConverter(File file) {
+    private void fileConverter(File file) {  //Convert from byte[] to file
         byte[] data = new byte[(int) file.length()];
         try {
             new FileInputStream(file).read(data);
@@ -166,11 +189,11 @@ public class SimpleActivity extends Activity {
         byteFile = data;
     }
 
-    private void fileSaver(byte[] recievedFile, String name) {
+    private void fileSaver(byte[] recievedFile) { //save from   file to byte[]
 
         Log.e(TAG, "fileSaver: " + recievedFile.length);
 
-        File file = new File(Environment.getExternalStorageDirectory(), name);
+        File file = new File(Environment.getExternalStorageDirectory(), tempFileName);
         FileOutputStream fos = null;
         if (file.exists()) {
             file.delete();
@@ -182,9 +205,28 @@ public class SimpleActivity extends Activity {
             fos.write(recievedFile);
             fos.close();
         } catch (java.io.IOException e) {
-            Log.e("PictureDemo", "Exception in photoCallback", e);
+            Log.e("Saving problemo", "Exception in fileSaver", e);
         }
 
 
     }
+
+    private void singleFileBrowser(String startPath) { // Browsing for files
+        new ChooserDialog().with(this)
+                .withStartFile(startPath)
+                .withChosenListener(new ChooserDialog.Result() {
+                    @Override
+                    public void onChoosePath(String path, File pathFile) {
+                        Toast.makeText(SimpleActivity.this, "FILE: " + path, Toast.LENGTH_SHORT).show();
+                        x = new File(path);
+                        fileDir = path;
+
+                    }
+                })
+                .build()
+                .show();
+        btnSend.setEnabled(true);
+    }
+
+
 }

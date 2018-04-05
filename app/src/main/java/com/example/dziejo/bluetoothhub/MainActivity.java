@@ -88,7 +88,8 @@ public class MainActivity extends Activity {
 
     public void onStreamBtnClicked(View view) {
         btChecker();
-        singleFileBrowser("/sdcard");
+        Intent openSender = new Intent(this, SimpleActivity.class);
+        startActivity(openSender);
     }
 
     public void onRecieveStream(View view) {
@@ -106,30 +107,7 @@ public class MainActivity extends Activity {
         return false;
     }
 
-    private void singleFileBrowser(String startPath) {
-        new ChooserDialog().with(this)
-                .withStartFile(startPath)
-                .withChosenListener(new ChooserDialog.Result() {
-                    @Override
-                    public void onChoosePath(String path, File pathFile) {
-                        Toast.makeText(MainActivity.this, "FILE: " + path, Toast.LENGTH_SHORT).show();
-                        chosenFile(path);
 
-                    }
-                })
-                .build()
-                .show();
-
-    }
-
-
-    private void chosenFile(String mydir) {
-
-
-        Intent openSender = new Intent(this, SimpleActivity.class);
-        openSender.putExtra("File", mydir);
-        startActivityForResult(openSender, 0);
-    }
 
 }
 
