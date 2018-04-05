@@ -56,6 +56,7 @@ public class SimpleActivity extends Activity {
         if (fileDir != null) {
             x = new File(intentFile.getStringExtra("File"));
             fileConverter(x);
+            Log.e(TAG, "onCreate: " + x.getName());
         }
 
         if (!bt.isBluetoothAvailable()) {
@@ -68,9 +69,9 @@ public class SimpleActivity extends Activity {
         //what is he doing when recieving data
         bt.setOnDataReceivedListener(new OnDataReceivedListener() {
             public void onDataReceived(byte[] data, String message) {
-                Toast.makeText(SimpleActivity.this, "Odebrałem plik kurwo", Toast.LENGTH_SHORT).show();
-                Log.e(TAG, "onDataReceived: i try to save");
-                fileSaver(data);
+                               Log.e(TAG, "onDataReceived: i try to save");
+                fileSaver(data, "xd");
+                Toast.makeText(SimpleActivity.this, "File has been recieved", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -130,9 +131,8 @@ public class SimpleActivity extends Activity {
         Button btnSend = findViewById(R.id.btnSend);
         btnSend.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                bt.send("Text", true);
-                if (byteFile != null)
-                    bt.send(byteFile, true);
+                bt.send(x.getName(), true);
+                if (byteFile != null) bt.send(byteFile, true);
             }
         });
     }
@@ -166,10 +166,11 @@ public class SimpleActivity extends Activity {
         byteFile = data;
     }
 
-    private void fileSaver(byte[] recievedFile) {
+    private void fileSaver(byte[] recievedFile, String name) {
 
         Log.e(TAG, "fileSaver: " + recievedFile.length);
-        File file = new File(Environment.getExternalStorageDirectory(), "jp2gmd.txt");
+
+        File file = new File(Environment.getExternalStorageDirectory(), name);
         FileOutputStream fos = null;
         if (file.exists()) {
             file.delete();

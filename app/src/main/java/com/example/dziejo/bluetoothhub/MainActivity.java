@@ -3,18 +3,22 @@ package com.example.dziejo.bluetoothhub;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.obsez.android.lib.filechooser.ChooserDialog;
+
+import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
     public static final String STREAM_MODE_CHOSEN = "Sender";
-    public static final String NORMAL_MODE_CHOSEN = "Normal";
     private static ToggleButton btnBt;
     private BluetoothAdapter mBluetoothAdapter;
     private Button btnSender, btnStream;
@@ -25,19 +29,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initElems();
-
-
-    }
-
-    public void clickSenderMode(View view) {
-        btChecker();
-        if (WENT_THROUGH_BT_CHECK) {
-            Intent intentFileChooser = new Intent(MainActivity.this, FileChooser.class);
-            intentFileChooser.putExtra("Which", NORMAL_MODE_CHOSEN);
-            startActivity(intentFileChooser);
-        }
+        isExternalStorageWritable();
 
     }
+
 
     @Override
     protected void onStart() {
@@ -52,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initElems() {
-        btnSender = findViewById(R.id.btnSender);
+
         btnBt = findViewById(R.id.tglBt);
         btnStream = findViewById(R.id.btnStream);
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -92,14 +87,48 @@ public class MainActivity extends AppCompatActivity {
 
     public void onStreamBtnClicked(View view) {
         btChecker();
-        Intent streamIntent = new Intent(MainActivity.this, FileChooser.class);
-        streamIntent.putExtra("Which", STREAM_MODE_CHOSEN);
-        startActivity(streamIntent);
+        singleFileBrowser("/sdcard");
     }
-    public void onRecieveStream(View view){
+
+    public void onRecieveStream(View view) {
         btChecker();
-        Intent streamRecieveIntent=new Intent(this,SimpleActivity.class);
+        Intent streamRecieveIntent = new Intent(this, SimpleActivity.class);
         startActivity(streamRecieveIntent);
     }
+
+
+    public boolean isExternalStorageWritable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            return true;
+        }
+        return false;
+    }
+
+    private void singleFileBrowser(String startPath) {
+        new ChooserDialog().with(this)
+                .withStartFile(startPath)
+                .withChosenListener(new ChooserDialog.Result() {
+                    @Override
+                    public void onChoosePath(String path, File pathFile) {
+                        Toast.makeText(MainActivity.this, "FILE: " + path, Toast.LENGTH_SHORT).show();
+                        chosenFile(path);
+
+                    }
+                })
+                .build()
+                .show();
+
+    }
+
+
+    private void chosenFile(String mydir) {
+
+
+        Intent openSender = new Intent(this, SimpleActivity.class);
+        openSender.putExtra("File", mydir);
+        startActivityForResult(openSender, 0);
+    }
+
 }
 

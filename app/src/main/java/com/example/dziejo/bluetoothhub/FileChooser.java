@@ -40,17 +40,9 @@ public class FileChooser extends AppCompatActivity {
 
 
     private void chosenFile(String mydir) {
-        Intent openSender = null;
-        if (whichMode != null) {
-            if (whichMode.equals(MainActivity.STREAM_MODE_CHOSEN)) {
-                openSender = new Intent(FileChooser.this, SimpleActivity.class);
-            } else if (whichMode.equals(MainActivity.NORMAL_MODE_CHOSEN)) {
-                openSender = new Intent(FileChooser.this, SendMode.class);
-            } else {
-                Toast.makeText(FileChooser.this, "Error with choosing mode,going back", Toast.LENGTH_LONG).show();
-                finish();
-            }
-        }
+
+
+        Intent openSender = new Intent(FileChooser.this, SimpleActivity.class);
         openSender.putExtra("File", mydir);
         startActivityForResult(openSender, 0);
     }
