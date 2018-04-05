@@ -66,12 +66,12 @@ public class SimpleActivity extends Activity {
             finish();
         }
 
-        //what is he doing when recieving data
+
         bt.setOnDataReceivedListener(new OnDataReceivedListener() {
             public void onDataReceived(byte[] data, String message) {
-                               Log.e(TAG, "onDataReceived: i try to save");
-                fileSaver(data, "xd");
-                Toast.makeText(SimpleActivity.this, "File has been recieved", Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "onDataReceived: i try to save");
+                fileSaver(data, message);
+                Toast.makeText(SimpleActivity.this, "File has been received", Toast.LENGTH_SHORT).show();
             }
         });
 

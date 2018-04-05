@@ -1,5 +1,6 @@
 package com.example.dziejo.bluetoothhub;
 
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,7 +18,7 @@ import com.obsez.android.lib.filechooser.ChooserDialog;
 
 import java.io.File;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
     public static final String STREAM_MODE_CHOSEN = "Sender";
     private static ToggleButton btnBt;
     private BluetoothAdapter mBluetoothAdapter;
